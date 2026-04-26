@@ -1,23 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from "react";
+import { shortenUrl } from "./services/urlService";
+import Homepage from "./pages/Homepage";
 
 function App() {
+  useEffect(() => {
+    const test = async () => {
+      try {
+        const result = await shortenUrl("https://google.com");
+        console.log("API works ! Response:", result);
+      } catch (error) {
+        console.error("API failed : ", error);
+      }
+    };
+
+    test();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Homepage />
     </div>
   );
 }
