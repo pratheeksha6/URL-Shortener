@@ -7,7 +7,28 @@ function Homepage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const validateUrl = (url) => {
+    if (!url) {
+      return "Please enter a URL";
+    }
+    try {
+      const parsed = new URL(url);
+      console.log(parsed);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        return "URL must start with http:// or https://";
+      }
+    } catch (e) {
+      return "Please enter a valid URL";
+    }
+    return null;
+  };
+
   const handleShorten = async () => {
+    const validateError = validateUrl(longUrl);
+    if (validateError) {
+      setError(validateError);
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -25,29 +46,48 @@ function Homepage() {
   };
 
   return (
-    <div>
-      <h1>URL Shortener</h1>
-      <input
-        type="text"
-        placeholder="Paste your long URL here"
-        value={longUrl}
-        onChange={(e) => setLongUrl(e.target.value)}
-      />
-      <button onClick={handleShorten} disabled={loading}>
-        Shorten
-      </button>
+    <div className="card">
+      <h1 className="title">URL Shortener</h1>
+      <div className="input-row">
+        <input
+          className="url-input"
+          type="text"
+          placeholder="Paste your long URL here"
+          value={longUrl}
+          onChange={(e) => {
+            setLongUrl(e.target.value);
+            setError("");
+            setShortUrl("");
+          }}
+        />
+        <button
+          className="shorten-btn"
+          onClick={handleShorten}
+          disabled={loading}
+        >
+          Shorten
+        </button>
+      </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error-msg">{error}</p>}
 
-      {loading && <p>⏳ Shortening your URL...</p>}
+      {loading && <p className="loading-msg">⏳ Shortening your URL...</p>}
 
       {shortUrl && (
-        <div>
-          <p>Shortened URL : </p>
-          <a href={shortUrl} target="_blank" rel="noreferrer">
-            {shortUrl}
-          </a>
+        <div className="result-box">
+          <div>
+            <p className="result-label">Shortened URL : </p>
+            <a
+              className="result-url"
+              href={shortUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {shortUrl}
+            </a>
+          </div>
           <span
+            className="copy-icon"
             onClick={handleCopy}
             title="Copy"
             style={{ cursor: "pointer", fontSize: "20px", marginLeft: "8px" }}
