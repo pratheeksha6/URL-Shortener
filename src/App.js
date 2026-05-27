@@ -1,24 +1,16 @@
-import { useEffect } from "react";
-import { shortenUrl } from "./services/urlService";
+import { Routes, Route } from "react-router-dom";
 import Homepage from "./pages/Homepage";
+import UsersPage from "./pages/UsersPage";
+import Navbar from "./components/Navbar";
 
 function App() {
-  useEffect(() => {
-    const test = async () => {
-      try {
-        const result = await shortenUrl("https://google.com");
-        console.log("API works ! Response:", result);
-      } catch (error) {
-        console.error("API failed : ", error);
-      }
-    };
-
-    test();
-  }, []);
-
   return (
     <div>
-      <Homepage />
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/users" element={<UsersPage />} />
+      </Routes>
     </div>
   );
 }

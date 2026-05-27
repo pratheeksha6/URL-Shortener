@@ -1,7 +1,7 @@
-const BASE_URL = "http://localhost:8080/api/v1/short-codes";
+const BASE_URL = "http://127.0.0.1:8000/api";
 
 export const shortenUrl = async (longUrl) => {
-  const response = await fetch(BASE_URL, {
+  const response = await fetch(`${BASE_URL}/v1/short-codes`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -17,7 +17,7 @@ export const shortenUrl = async (longUrl) => {
 };
 
 export const getLongUrl = async (shortCode) => {
-  const response = await fetch(`${BASE_URL}/{shortCode}`, {
+  const response = await fetch(`${BASE_URL}/v1/short-codes/${shortCode}`, {
     redirect: "manual",
   });
 
@@ -26,4 +26,19 @@ export const getLongUrl = async (shortCode) => {
   if (!longUrl) {
     throw new Error("Could not find original URL");
   }
+};
+
+export const deleteUrl = async (shortCode) => {
+  const response = await fetch(
+    `${BASE_URL}/v1/short-codes/${shortCode}/delete`,
+    {
+      method: "Delete",
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to delete URL");
+  }
+
+  return response.json();
 };

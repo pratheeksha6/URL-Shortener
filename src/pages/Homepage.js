@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { shortenUrl } from "../services/urlService";
+import { deleteUrl, shortenUrl } from "../services/urlService";
 
 function Homepage() {
   const [longUrl, setLongUrl] = useState("");
@@ -7,6 +7,7 @@ function Homepage() {
   const [shortUrl, setShortUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(null);
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem("urlHistory");
     return saved ? JSON.parse(saved) : [];
@@ -38,15 +39,13 @@ function Homepage() {
     setError("");
     try {
       const result = await shortenUrl(longUrl);
-      const shortCode = result.shortUrl.split("/").pop();
-      const correctShortUrl = `http://localhost:8080/api/v1/short-codes/${shortCode}`;
-      setShortUrl(correctShortUrl);
+      setShortUrl(result.shortUrl);
       setSubmittedLongUrl(longUrl);
       setLongUrl("");
 
       const newItem = {
         longUrl: longUrl,
-        shortUrl: correctShortUrl,
+        shortUrl: result.shortUrl,
       };
 
       const updatedHistory = [newItem, ...history];
@@ -59,14 +58,26 @@ function Homepage() {
     }
   };
 
-  const handleDeleteHistory = (index) => {
-    const updatedHistory = history.filter((_, i) => i !== index);
-    setHistory(updatedHistory);
-    localStorage.setItem("urlHistory", JSON.stringify(updatedHistory));
+  const handleDeleteHistory = async (index) => {
+    try {
+      const item = history[index];
+      const shortCode = item.shortUrl.split("/").pop();
+      console.log("Deleting short code:", shortCode);
+      console.log("FUll url", item.shortUrl);
+      await deleteUrl(shortCode);
+    } catch (error) {
+      console.error("Failed to delete from database:", error);
+    } finally {
+      const updatedHistory = history.filter((_, i) => i !== index);
+      setHistory(updatedHistory);
+      localStorage.setItem("urlHistory", JSON.stringify(updatedHistory));
+    }
   };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shortUrl);
+    setCopied("result");
+    setTimeout(() => setCopied(null), 2000);
   };
 
   return (
@@ -119,7 +130,7 @@ function Homepage() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {shortUrl}
+                  {shortUrl.split("/").pop()}
                 </a>
               </div>
               <span className="copy-icon" onClick={handleCopy} title="Copy">
@@ -170,35 +181,52 @@ function Homepage() {
                     rel="noreferrer"
                   >
                     {" "}
-                    {item.shortUrl}
+                    {item.shortUrl.split("/").pop()}
                   </a>
                 </div>
+
                 <span
                   className="copy-icon"
                   title="copy"
-                  onClick={() => navigator.clipboard.writeText(item.shortUrl)}
+                  onClick={() => {
+                    navigator.clipboard.writeText(item.shortUrl);
+                    setCopied(index);
+                    setTimeout(() => setCopied(null), 2000);
+                  }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect
-                      x="9"
-                      y="9"
-                      width="13"
-                      height="13"
-                      rx="2"
-                      ry="2"
-                    ></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                  </svg>
+                  {copied === index ? (
+                    <span
+                      style={{
+                        fontSize: "13px",
+                        color: "#7c3aed",
+                        fontFamily: "Georgia",
+                      }}
+                    >
+                      Copied!
+                    </span>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect
+                        x="9"
+                        y="9"
+                        width="13"
+                        height="13"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  )}
                 </span>
                 <span
                   className="delete-icon"

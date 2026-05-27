@@ -1,0 +1,80 @@
+.input-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.url-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1.5px solid #ddd6fe;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #4c1d95;
+  outline: none;
+  font-family: inherit;
+}
+
+.url-input::placeholder {
+  color: #c4b5fd;
+}
+
+.url-input:focus {
+  border-color: #7c3aed;
+}
+
+.shorten-btn {
+  width: auto;
+  padding: 14px 28px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.shorten-btn:hover {
+  background: #6d28d9;
+}
+
+.shorten-btn:disabled {
+  background: #c4b5fd;
+  cursor: not-allowed;
+}
+
+.error-msg {
+  font-size: 13px;
+  color: #dc2626;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+}
+
+.loading-msg {
+  font-size: 13px;
+  color: #7c3aed;
+  text-align: center;
+  margin: 16px 0;
+}
+
+@media (max-width: 768px) {
+  .input-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .shorten-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .url-input {
+    font-size: 13px;
+  }
+  .shorten-btn {
+    font-size: 13px;
+  }
+}
